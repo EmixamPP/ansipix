@@ -43,26 +43,16 @@ pub fn of_image_with_filter(
     resize_filter: FilterType,
 ) -> String {
     let esc = if raw { "\\x1b" } else { "\x1b" };
-
-    let mut pixels: Vec<Vec<[u8; 4]>> = vec![];
-    for (x, y, pix) in image
-        .resize(size.0 as u32, size.1 as u32, resize_filter)
-        .pixels()
-    {
-        if x == 0 {
-            pixels.push(vec![]);
-        }
-        pixels[y as usize].push(pix.0);
-    }
+    let image = image.resize(size.0 as u32, size.1 as u32, resize_filter);
 
     let mut out: String = String::new();
-    for line in (0..pixels.len()).filter(|index| index % 2 == 0) {
-        for char in 0..pixels[line].len() {
-            let top_pix: [u8; 4] = pixels[line][char];
-            let bot_pix: [u8; 4] = if line + 1 >= pixels.len() {
+    for y in (0..image.height()).step_by(2) {
+        for x in 0..image.width() {
+            let top_pix = image.get_pixel(x, y).0;
+            let bot_pix = if y + 1 >= image.height() {
                 [0; 4]
             } else {
-                pixels[line + 1][char]
+                image.get_pixel(x, y + 1).0
             };
             let top_invis: bool = top_pix[3] < alpha_threshold;
             let bot_invis: bool = bot_pix[3] < alpha_threshold;
