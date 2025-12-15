@@ -42,9 +42,21 @@ pub fn of_image_with_filter(
     raw: bool,
     resize_filter: FilterType,
 ) -> String {
-    let esc = if raw { "\\x1b" } else { "\x1b" };
     let image = image.resize(size.0 as u32, size.1 as u32, resize_filter);
+    convert(image, alpha_threshold, raw)
+}
 
+/// Convert a [`DynamicImage`] to a [`String`] with [ANSI escape sequences](https://en.wikipedia.org/wiki/ANSI_escape_code).
+///
+/// ## Params
+/// - `image`: [`DynamicImage`] - The image to convert.
+/// - `alpha_threshold`: [`u8`] - Minimum alpha value of a pixel for it to be shown. `0` for no transparent background.
+/// - `raw`: [`bool`] - Whether to escape the escape sequences.
+///
+/// ## Returns
+/// A [`String`] containing the image.
+pub fn convert(image: DynamicImage, alpha_threshold: u8, raw: bool) -> String {
+    let esc = if raw { "\\x1b" } else { "\x1b" };
     let mut out: String = String::new();
     for y in 0..image.height() {
         for x in 0..image.width() {
