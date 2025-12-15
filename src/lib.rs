@@ -46,7 +46,7 @@ pub fn of_image_with_filter(
     let image = image.resize(size.0 as u32, size.1 as u32, resize_filter);
 
     let mut out: String = String::new();
-    for y in (0..image.height()).step_by(2) {
+    for y in 0..image.height() {
         for x in 0..image.width() {
             let top_pix = image.get_pixel(x, y).0;
             let bot_pix = if y + 1 >= image.height() {
